@@ -56,23 +56,31 @@ Class Action {
 		header("location:../index.php");
 	}
 
-	function save_user(){
-		extract($_POST);
-		$data = " name = '$name' ";
-		$data .= ", username = '$username' ";
-		$data .= ", password = '$password' ";
-		$data .= ", type = '$type' ";
-		$data .= ", doctor_id = 0"; 
-		$data .= ", address = ''"; 
-		$data .= ", contact = ''"; 
-		
-		if(empty($id)){
-			$save = $this->db->query("INSERT INTO users set ".$data);
-		}else{
-			$save = $this->db->query("UPDATE users set ".$data." where id = ".$id);
+	public function save_user() {
+		include 'db_connect.php';
+		$id = $_POST['id'];
+		$name = $_POST['name'];
+		$username = $_POST['username'];
+		$password = $_POST['password'];
+		$type = $_POST['type'];
+		$doctor_id = isset($_POST['doctor_id']) ? $_POST['doctor_id'] : 0;
+		$address = isset($_POST['address']) ? $_POST['address'] : '';
+		$contact = isset($_POST['contact']) ? $_POST['contact'] : '';
+
+		$hashed_password = password_hash($password, PASSWORD_DEFAULT);
+	
+		if(empty($id)) {
+			$stmt = $conn->prepare("INSERT INTO users (name, username, password, type, doctor_id, address, contact) VALUES (?, ?, ?, ?, ?, ?, ?)");
+			$stmt->bind_param("sssisss", $name, $username, $hashed_password, $type, $doctor_id, $address, $contact);
+		} else {
+			$stmt = $conn->prepare("UPDATE users SET name = ?, username = ?, password = ?, type = ?, doctor_id = ?, address = ?, contact = ? WHERE id = ?");
+			$stmt->bind_param("sssisssi", $name, $username, $hashed_password, $type, $doctor_id, $address, $contact, $id);
 		}
-		if($save){
-			return 1;
+	
+		if($stmt->execute()) {
+			return true;
+		} else {
+			return false;
 		}
 	}
 

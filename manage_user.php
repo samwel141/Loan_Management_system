@@ -8,20 +8,22 @@ if(isset($_GET['id'])){
 }
 ?>
 <div class="container-fluid">
-    
-    <form action="" id="manage-user">
+    <form action="" id="manage-user" autocomplete="off">
+        <input type="text" name="fakeusernameremembered" id="fakeusernameremembered" style="display: none;">
+        <input type="password" name="fakepasswordremembered" id="fakepasswordremembered" style="display: none;">
+
         <input type="hidden" name="id" value="<?php echo isset($meta['id']) ? $meta['id']: '' ?>">
         <div class="form-group">
             <label for="name">Name</label>
-            <input type="text" name="name" id="name" class="form-control" value="<?php echo isset($meta['name']) ? $meta['name']: '' ?>" required>
+            <input type="text" name="name" id="name" class="form-control" value="<?php echo isset($meta['name']) ? $meta['name']: '' ?>" required autocomplete="off">
         </div>
         <div class="form-group">
             <label for="username">Username</label>
-            <input type="text" name="username" id="username" class="form-control" value="<?php echo isset($meta['username']) ? $meta['username']: '' ?>" required>
+            <input type="text" name="username" id="username" class="form-control" value="<?php echo isset($meta['username']) ? $meta['username']: '' ?>" required autocomplete="off">
         </div>
         <div class="form-group">
             <label for="password">Password</label>
-            <input type="password" name="password" id="password" class="form-control" value="<?php echo isset($meta['password']) ? $meta['password']: '' ?>" required>
+            <input type="password" name="password" id="password" class="form-control" value="<?php echo isset($meta['password']) ? $meta['password']: '' ?>" required autocomplete="new-password">
         </div>
         <div class="form-group">
             <label for="type">User Type</label>
@@ -33,14 +35,20 @@ if(isset($_GET['id'])){
     </form>
 </div>
 <script>
-    $('#manage-user').submit(function(e){
-    e.preventDefault();
-    start_load()
-    $.ajax({
-        url: 'ajax.php?action=save_user',
-        method: 'POST',
-        data: $(this).serialize(),
-        success: function(response) {
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById("new_username").value = "";
+        document.getElementById("new_password").value = "";
+    });
+
+
+    $('#manage-user').submit(function(e) {
+        e.preventDefault();
+        start_load()
+        $.ajax({
+            url: 'ajax.php?action=save_user',
+            method: 'POST',
+            data: $(this).serialize(),
+            success: function(response) {
                 if (response.success) {
                     alert_toast("User successfully saved", 'success');
                     setTimeout(function() {
@@ -49,8 +57,11 @@ if(isset($_GET['id'])){
                 } else {
                     alert_toast("Failed to save data. Please try again.", 'error');
                 }
-        },
-       
-    });
+            },
+            error: function(jqXHR, textStatus, errorThrown) {
+                console.error('AJAX error:', textStatus, errorThrown);
+                alert_toast("Failed to save data. Please try again.", 'error');
+            }
+        });
     });
 </script>
