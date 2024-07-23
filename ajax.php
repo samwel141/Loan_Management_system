@@ -61,12 +61,23 @@ if ($action == 'login') {
 } elseif ($action == "delete_loan") {
     $response = $crud->delete_loan();
 } elseif ($action == "save_payment") {
+    // if($resp == 1){
+	// 	$response = array('success' => true, 'message' => 'Payment saved');
+	// } else {
+	// 	$response = array('success' => false, 'message' => $resp);
+	// }
     $response = $crud->save_payment();
+    // echo $response;
 } elseif ($action == "delete_payment") {
     $response = $crud->delete_payment();
 }
 
 
 ob_end_clean();
-echo json_encode($response);
+
+if (is_array($response)) {
+    echo json_encode($response);
+} else {
+    echo $response;
+}
 ?>
